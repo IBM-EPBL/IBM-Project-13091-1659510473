@@ -1,35 +1,38 @@
-        PYTHON CODE
-
-
-
 #IBM Watson IOT Platform
 #pip install wiotp-sdk
+import ibmiotf.application
+import ibmiotf.device
 import wiotp.sdk.device
 import time
 import random
-myConfig = { 
-    "identity": {
-        "orgId": "hj5fmy",
-        "typeId": "NodeMCU",
-        "deviceId":"12345"
-    },
-    "auth": {
-        "token": "12345678"
-    }
+import sys
+myConfig = {
+    "orgId": "47q5qp",
+    "deviceTyoe": "ibmproject",
+    "deviceId":"23456",
+    "auth-method" : "use-token-auth",
+    "token_auth": "M7bl6f8ZRoFWGdJXGD"
 }
-
 def myCommandCallback(cmd):
     print("Message received from IBM IoT Platform: %s" % cmd.data['command'])
     m=cmd.data['command']
-
-client = wiotp.sdk.device.DeviceClient(config=myConfig, logHandlers=None)
+try :
+    options=myConfig
+    client=wiotp.sdk.device.DeviceClient(options)
+except Exception as e:
+    print("this is exception: %s" %str(e))
+    sys.exit()
 client.connect()
 
 while True:
-    temp=random.randint(-20,125)
+    distance=random.randint(-20,125)
     hum=random.randint(0,100)
-    myData={'temperature':temp, 'humidity':hum}
-    client.publishEvent(eventId="status", msgFormat="json", data=myData, qos=0, onPublish=None)
+    lattitude=23
+    longitude=56
+    def myonPublishCallback():
+        print("published data to iot watson" %distance)
+        myData={'temperature':distance, 'humidity':hum,'lattitude' : lattitude,'longitude':longitude}
+    client.publishEvent("status","json", myData, qos=0, onPublish=myCommandCallback)
     print("Published data Successfully: %s", myData)
     client.commandCallback = myCommandCallback
     time.sleep(2)
